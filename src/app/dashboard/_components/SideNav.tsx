@@ -15,18 +15,18 @@ const SideNav = () => {
         {
             name: 'Home',
             icon: Home,
-            path: '/dasboard'
+            path: '/dashboard'
 
         },
         {
             name: 'History',
             icon: FileClock,
-            path: '/dasboard/history'
+            path: '/dashboard/history'
 
         }, {
             name: 'Subscribe',
             icon: WalletCards,
-            path: '/dasboard/subscribe'
+            path: '/dashboard/subscribe'
 
         }, {
             name: 'Settings',
@@ -43,48 +43,20 @@ const SideNav = () => {
 
 
         <div className='h-screen p-5 shadow-sm border bg-white relative'>
-            <div className='flex justify-center'>
-                <Image src={'/logo.svg'} alt='logo' width={120} height={100} />
-                <ul>
-                    <li>
-                        <Link href='/dashboard'><Home className='w-6 h-6' /></Link>
-                    </li>
-                    <li>
-                        <Link href='/dashboard/history'><FileClock /></Link>
-                    </li>
-                    <li>
-                        <Link href='/dashboard/billing'><WalletCards /></Link>
-                    </li><li>
-                        <Link href='/dashboard/settings'><Settings /></Link>
-                    </li>
-                </ul>
-            </div>
             <div className='mt-10'>
                 {
                     menuList.map((menu, index) => (
-
-                        <Link
-                        href={menu.path}
-                        key={menu.name}
-                        className={`flex gap-2 mb-2 p-3 hover:bg-primary hover:text-white 
-                            rounded-lg cursor cursor-pointer items-center ${pathname == menu.path && 'bg-cyan text-white'} ${menu.path == pathname}`}>
-                        
-                      
-                        <menu.icon className="h-6 w-6"></menu.icon>
-                        <h2 className="text-lg">{menu.name}</h2>
-                      </Link>
-
-                    //     <Link href={menu.path} key={menu.name}>
-                    //         <div key={index} className={`flex gap-2 mb-2 p-3 hover:bg-primary hover:text-white 
-                    // rounded-lg cursor cursor-pointer items-center ${pathname == menu.path && 'bg-cyan text-white'} ${menu.pathname == pathname}`}>
+                        <Link href={menu.path} key={menu.name}>
+                            <div key={index} className={`flex gap-2 mb-2 p-3 hover:bg-primary hover:text-white 
+                    rounded-lg cursor cursor-pointer items-center ${pathname == menu.path && 'bg-primary text-white'} ${menu.path == pathname}`}>
 
 
-                    //             <menu.icon className='h6 w-6' />
+                                <menu.icon className='h6 w-6' />
 
-                    //             <h2 className='text-lg'>{menu.name}</h2>
+                                <h2 className='text-lg'>{menu.name}</h2>
 
-                    //         </div>
-                    //     </Link>
+                            </div>
+                        </Link>
 
                     ))
                 }

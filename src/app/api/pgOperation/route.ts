@@ -51,15 +51,8 @@ export const POST = async (req: NextRequest) => {
         const result = await db.select()
             .from(aiOutputSchema)
             .where(eq(aiOutputSchema.createdBy, email))
-        // console.log(result)
-        // let total = 0
-        // result.forEach(ele => {
-        //     total += ele.aiResponse?.length
-        // })
-        // console.log(total)
 
-
-        return NextResponse.json({ 'userEnteries': result })
+        return Response.json({ 'userEnteries': result })
     }else{
         return Response.json({
             error:`No params found for ${data.params} method ${req.method}`
