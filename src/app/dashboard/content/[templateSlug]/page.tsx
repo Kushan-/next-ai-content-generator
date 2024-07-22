@@ -15,25 +15,13 @@ const SlugPage = ({ params }: any) => {
   const selectedTemplate: TEMPLATE | undefined = templateData?.find(item => item.slug === params.templateSlug)
   const templateSlug = params.templateSlug
   return (
-
-
-
-
     <div className='p-5'>
       <h5>{params.templateSlug}</h5>
       <Link href={`/dashboard`}>
         <Button><ArrowLeft />Back</Button>
       </Link>
-
-
       <FormSection templateSlug={templateSlug} />
-
     </div>
-
-
-
-
-
   )
 }
 

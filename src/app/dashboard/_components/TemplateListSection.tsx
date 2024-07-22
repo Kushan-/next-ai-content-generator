@@ -42,9 +42,6 @@ const TemplateListSection = ({searchInputResult}:any) => {
         
         {templatList.map( (item:TEMPLATE, index:number) => (
             <TemplateCard key={index} {...item}/>
-            
-            
-            
         ))}
     </div>
   )

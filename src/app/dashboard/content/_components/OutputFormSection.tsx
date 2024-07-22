@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { Button } from '@/components/ui/button';
 import '@toast-ui/editor/dist/toastui-editor.css';
@@ -12,12 +13,19 @@ interface PROPS {
   aiResponseOutput:string|undefined
 }
 
-const OutputFormSection = ({aiResponseOutput}:PROPS) => {
+interface STATE {
+  aiResponse:{
+    aiResponseContent:String
+  }
+}
+
+const OutputFormSection = () => {
   const editorRef:any = useRef()
+  
+  const aiResponseOutput = useSelector((state:STATE) => state.aiResponse.aiResponseContent)
 
   useEffect(()=>{
     const editorInstance=editorRef.current.getInstance();
-    console.log(typeof(editorInstance))
     editorInstance.setMarkdown(aiResponseOutput)
   },[aiResponseOutput])
 
@@ -29,7 +37,6 @@ const OutputFormSection = ({aiResponseOutput}:PROPS) => {
       <Button className='flex gap-2'><Copy className='w-4 h-4'/>Copy</Button>
     </div>
 
-    {/* <ToastEditor/> */}
     <Editor
       ref={editorRef}
       initialValue="Appearing  Result...."
@@ -37,7 +44,9 @@ const OutputFormSection = ({aiResponseOutput}:PROPS) => {
       initialEditType='wysiwyg'
       height="600px"
       useCommandShortcut={true}
-      onChange={()=>console.log(editorRef.current.getInstance().getMarkdown())}
+      onChange={()=>console.log(editorRef.current.getInstance().getMarkdown())
+        
+      }
     />
   </div>
 
