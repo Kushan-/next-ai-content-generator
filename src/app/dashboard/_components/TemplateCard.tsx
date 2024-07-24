@@ -6,7 +6,7 @@ import Link from 'next/link'
 const TemplateCard = (item:TEMPLATE) => {
   return (
     <Link href={`/dashboard/content/${item.slug}`}>
-    <div className='p-5 shadow-md rounded-md border cursor-pointer bg-white flex flex-col gap-3 hover:scale-105'>
+    <div className='p-5 shadow-md rounded-md border cursor-pointer bg-white flex flex-col gap-3 hover:scale-105 hover:shadow-2xl'>
         <Image src={item.icon} alt='icon' width={120} height={100}/>
         <h2 className='font-medium text-lg'>
             {item.name}

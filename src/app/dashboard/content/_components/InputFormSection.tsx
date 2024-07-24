@@ -36,7 +36,6 @@ const InputFormSection = ({ selectedTemplate, templateSlug }: PROPS) => {
   const { user }: any = useUser()
 
   const userEmail = user?.primaryEmailAddress?.emailAddress
-  localStorage.setItem('client-email', userEmail)
 
 
   const onSubmit = (e: any) => {
@@ -80,13 +79,13 @@ const InputFormSection = ({ selectedTemplate, templateSlug }: PROPS) => {
       console.log(response.status)
       if (response.status === 200) {
         
-        console.log("=========set Dispatch to true===========")
+        // console.log("=========set Dispatch to true===========")
         setLoadingAiResponse(false)
         console.log(response)
       } else {
         setLoadingAiResponse(true)
       }
-      console.log("=========set Dispatch to FALSE===========")
+      // console.log("=========set Dispatch to FALSE===========")
       dispatch(historyAction.upadateCreaditUsage(false))
     }
     generateAiContent(formData)

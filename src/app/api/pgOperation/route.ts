@@ -1,23 +1,31 @@
 // /api/postGresOperation
 import { NextRequest, NextResponse} from "next/server"
 
-import { db } from './db'
-import { aiOutputSchema } from './schema'
+import { db } from '../../../lib/db'
+import { aiOutputSchema } from '../../../lib/schema'
 import { eq } from 'drizzle-orm';
-
+import { auth, currentUser } from "@clerk/nextjs/server"
+// import { premiumUserExit, stripeCustomerExist } from "@/lib/dbUtils";
 
 export const PUT = async (req: NextRequest) => {
-    // console.log(req.json())
-    console.log("======in put req==================")
+    const {userId, } = auth()
+    const user=await currentUser();
+
+    console.log("userId ->", userId)
+    console.log('user->', currentUser())
+    if(!userId){
+        return new NextResponse("Unauthorized", { status: 401 });
+    }
     const data = await req.json()
-    console.log("params->", data.params)
-    console.log(data)
-    if (data.params === "dbInertion" ) {
+    if (data.params === "dbInertion" && userId) {
+     console.log("--->>> email not from params ==== ",user?.primaryEmailAddress?.emailAddress)
+     console.log(user?.fullName)   
         
         const { formData, templateSlug, aiResponse, createdBy, createdAt } = data
         console.log("formData->", formData)
         // console.log(aiContentPayload)
-        const dbResult = await db.insert(aiOutputSchema).values({
+        const createNewInsertion = await db.insert(aiOutputSchema).values({
+            userId:userId,
             formData: JSON.stringify(formData),
             templateSlug: templateSlug,
             aiResponse: aiResponse,
@@ -25,10 +33,10 @@ export const PUT = async (req: NextRequest) => {
             createdAt: createdAt
         })
 
-        return Response.json({ dbResult })
+        return NextResponse.json( createNewInsertion, { status: 200 })
 
     }else{
-        return Response.json({
+        return NextResponse.json({
             error:`No params found for ${data.params} method ${req.method}`
         })
 
@@ -42,6 +50,13 @@ export const POST = async (req: NextRequest) => {
     console.log("===================")
     console.log(data.params)
     console.log("===================")
+    const {userId} = auth()
+    const user=await currentUser();
+    console.log("userId ->", userId)
+    console.log('user->', currentUser)
+    if(!userId){
+        return new NextResponse("Unauthorized", { status: 401 });
+    }
 
     // insertAiContent(req)
     if (data.params === "creditUsageTracker" || data.params === "userHistoryContent") {
@@ -51,8 +66,9 @@ export const POST = async (req: NextRequest) => {
         const result = await db.select()
             .from(aiOutputSchema)
             .where(eq(aiOutputSchema.createdBy, email))
-
-        return Response.json({ 'userEnteries': result })
+        console.log(typeof(result))
+        console.log(result)
+        return NextResponse.json(result)
     }else{
         return Response.json({
             error:`No params found for ${data.params} method ${req.method}`

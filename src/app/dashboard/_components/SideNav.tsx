@@ -62,7 +62,8 @@ const SideNav = () => {
                 }
             </div>
             <div className='absolute bottom-10'>
-                <CreditUsageTracker />
+                CreditUsage
+                {/* <CreditUsageTracker /> */}
             </div>
 
         </div>
