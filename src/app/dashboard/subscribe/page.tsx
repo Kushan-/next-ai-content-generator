@@ -14,9 +14,11 @@ import { Button } from "@/components/ui/button";
 
 import { useUser } from '@clerk/clerk-react'
 import moment from 'moment'
+import { useState } from "react";
 
 const SubscribePage = () => {
 
+  const [purchaseErr, setPuchaseErr] = useState("")
   const router = useRouter();
   const { user }: any = useUser()
   const userEmail = user?.primaryEmailAddress?.emailAddress
@@ -30,14 +32,28 @@ const SubscribePage = () => {
     }
 
 
-    const response = await fetch("/api/upgrade/checkout", {
+    const response = await fetch("/api/upgrade/", {
       method: 'POST',
       body: JSON.stringify(payload),
-    });
+    }).then((res) => res.json()).then(data=>{
+      if(data.url){
+        router.push(data.url)
+      }else{
+        let errorText=""
+        if(data.err.raw.code){
+          errorText = `${data.err.raw.code} error status code ${data.err.statusCode}`
+        }
+        
+        if(data.err.raw.message){
+          errorText = `${data.err.raw.message} error status code ${data.err.statusCode}`
+        }else{
+          errorText=`error status code ${data.err.statusCode}`
+        }
+        setPuchaseErr(errorText)
+      }
+      
+    })
   }
-
-  // push user to the stripe url
-  // router.push(response.data.url);
 
   return (
     <div className="mx-5 py-2">
@@ -62,9 +78,16 @@ const SubscribePage = () => {
                 <Check></Check> Retain All History
               </p>
             </div>
+            <div className="flex flex-col space-y-5">
             <Button className="mt-5" onClick={handleOnClick}>
               Purchase
             </Button>
+            {
+              purchaseErr?<span className="bg-red-500 text-white">{purchaseErr}</span>:null
+            }
+            </div>
+          
+            
           </CardContent>
         </Card>
       </div>

@@ -3,6 +3,7 @@
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react'
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { useUser } from '@clerk/clerk-react';
 
 
 import { historyAction } from '../../../../store';
@@ -27,13 +28,17 @@ interface ENTERIES {
     'aiResponse': string
 }
 
-const UserContentHistory = ({ userEmailId }: PROPS) => {
+const UserContentHistory = () => {
     const [userHistory, setUserHistoryContent] = useState([])
     // const { user } = useUser()
     //getHistoryByuser(user)
     // console.log(result)
     // console.log("rendering history page")
     // console.log("UserContent History email ->", userEmailId);
+    
+    const { user } = useUser()
+    const userId = user?.id
+    const userEmailId = user?.primaryEmailAddress?.emailAddress
     useEffect(() => {
         if (userEmailId) {
             const fetchData = async (userEmailId: string) => {
@@ -48,54 +53,12 @@ const UserContentHistory = ({ userEmailId }: PROPS) => {
                         'Content-Type': 'application/json'
                     },
                 }).then((res) => res.json())
-                    // console.log(data.body())
-                    // const respData= data.json()
-                    // console.log(respData)
-                    // console.log(data.json())
-                    // return data.json()
                     .then(data => {
                         console.log(data)
                         console.log(Object.keys(data).length)
                         if (Object.keys(data).length > 0) {
                             setUserHistoryContent(data)
-                            // let historyContentArray = []
-                            // for (let entry in data) {
-                            //     console.log(data[entry])
-                            //     historyContentArray.push(data[entry])
-                            // }
-                            // console.log(historyContentArray)
                         }
-
-                        // let total = 0
-
-                        // if (Object.keys(data.userEnteries).length > 0) {
-                        //     // setUserHistoryContent([data.userEnteries])
-                        //     for (let key in data.userEnteries) {
-                        //         console.log(key)
-                        //         console.log(data.userEnteries.key)
-                        //     }
-                        //     data.userEntries.forEach((enteries: ENTERIES, index: number) => {
-
-
-                        //         if (enteries.aiResponse) {
-                        //             console.log(enteries.aiResponse.length, 'at index->', index)
-                        //             total = total + enteries.aiResponse.length
-                        //         } else {
-                        //             console.log(enteries)
-                        //         }
-                        //         console.log('final tally ->', total)
-
-                        //     })
-                        // }
-
-
-                        // for(let entries in data){
-                        //     console.log(entries)
-                        //     console.log(entries.aiResponse.length)
-                        //     total += entries.aiResponse.length
-
-                        // }
-
 
                     }).catch((err: any) => {
                         console.log(err)
@@ -105,7 +68,7 @@ const UserContentHistory = ({ userEmailId }: PROPS) => {
             fetchData(userEmailId)
 
         }
-    }, [userEmailId])
+    }, [])
     return (
 
         <div>

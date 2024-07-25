@@ -5,16 +5,9 @@ import Link from "next/link";
 
 
 export default function Home() {
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <Link href='/dashboard'>Home</Link>
-        <Link href='/dashboard/history'>History</Link>
-        <Link href='/dashboard/subscribe'>Subscribe</Link>
-        <Link href='/dashboard/settings'>Setting</Link>
-        <Button> Shadcn Button</Button>
-
-      </div>
       <div className="flex flex-col min-h-[100dvh]">
         <header className="px-4 mt-5 lg:px-6 h-14 flex items-center">
           {/* <Logo /> */}

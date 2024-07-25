@@ -1,54 +1,66 @@
-import { createSlice, configureStore} from '@reduxjs/toolkit'
+import { createSlice, configureStore } from '@reduxjs/toolkit'
 
 
-const userHistory = {userHistoryData:[], userCreditUsage:0, updateCreditUsage:false}
+const userHistory = { userHistoryData: [], userCreditUsage: 0, toggleCreditHistoryUpdate: false }
 
-const userHistorySlice = createSlice( {
+const userHistorySlice = createSlice({
     name: 'history',
     initialState: userHistory,
     reducers: {
-        upadateCreaditUsage (state, action){
+        toggleCreditHistoryUpdate(state, action) {
             console.log("-------Hellow from redux -----------''")
             console.log(`usercredit usage payload ${action.payload}`)
-            state.updateCreditUsage = action.payload        
+            state.toggleCreditHistoryUpdate = action.payload
+        },
+        updateCreditUsage(state, action) {
+            console.log("--- redux store-> updateCreditUsage----",action.payload)
+            const params = action.payload.params
+            if (state.userCreditUsage < action.payload.responseLength) {
+                return state.userCreditUsage
+            }
+            if (params === "initiate") {
+                state.userCreditUsage = action.payload.totalRemainingCredits
+            } else if (params === "update") {
+                state.userCreditUsage = state.userCreditUsage - action.payload.responseLength
+            }
         }
 
 
     }
 
-} )
+})
 
-const initialAiResponse = {aiResponseContent:'',}
+const initialAiResponse = { aiResponseContent: '', }
 
 const aiResponseSlice = createSlice({
-    name:'aiResponse',
+    name: 'aiResponse',
     initialState: initialAiResponse,
-    reducers:{
-        updateAiResponse(state, action){
+    reducers: {
+        updateAiResponse(state, action) {
             state.aiResponseContent = action.payload
         }
     }
 })
 
 
-const initialAuthstate = {isAuth :  false}
+const initialAuthstate = { isAuth: false }
 
-const authSlice = createSlice( {
+const authSlice = createSlice({
     name: ' auth',
     initialState: initialAuthstate,
-    reducers : {
-        login(state){
-            state.isAuth=true
+    reducers: {
+        login(state) {
+            state.isAuth = true
         },
-        logout(state){
-            state.isAuth=false
+        logout(state) {
+            state.isAuth = false
         }
     }
-} )
+})
 
-const reduxStore = configureStore( {
-    reducer : {
-        
+const reduxStore = configureStore({
+    reducer: {
+
         auth: authSlice.reducer,
         history: userHistorySlice.reducer,
         aiResponse: aiResponseSlice.reducer

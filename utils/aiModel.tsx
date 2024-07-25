@@ -5,12 +5,13 @@
 // } = require("@google/generative-ai");
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import {NEXT_GEMINI_API_KEY} from "./envConfig"
 
 // console.log(process.env.NEXT_GEMINI_API_KEY)
-const apiKey = process.env.NEXT_GEMINI_API_KEY;
+// const apiKey = process.env.NEXT_GEMINI_API_KEY;
 // console.log(apiKey, process.env.NEXT_GEMINI_API_KEY)
 // console.log(typeof(apiKey))
-const genAI = new GoogleGenerativeAI(`AIzaSyA_O6NueMCSwXCTb14-DlV2_rPFgi5qTYA`);
+const genAI = new GoogleGenerativeAI(NEXT_GEMINI_API_KEY);
 
 const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",

@@ -5,39 +5,20 @@ import { auth, currentUser } from "@clerk/nextjs/server"
 import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm';
 import { premiumUser, stripeCustomer } from '@/lib/schema'
+import { insertPremiumUser, upgradeToPaid,premiumUserExit, stripeCustomerExist } from "@/lib/dbUtils";
+import moment from "moment";
+import { Result } from "postcss";
+import { STRIPE_WEBHOOK_ENPOINT_KEY } from "../../../../utils/envConfig";
+import { STRIPE_PASS_KEY } from "../../../../utils/envConfig";
 
 
 
-console.log(process.env.STRIPE_PASS_KEY)
-const stripe = new Stripe(process.env.STRIPE_PASS_KEY as string, {
+console.log("stripe pass key", process.env.STRIPE_PASS_KEY, STRIPE_PASS_KEY) 
+const stripe = new Stripe(STRIPE_PASS_KEY as string, {
     apiVersion: '2024-06-20'
 })
 
-export const premiumUserExit = async (userId: string) => {
-    const result = await db.select()
-        .from(premiumUser)
-        .where(eq(premiumUser.userId, userId))
-
-    if (result) {
-        return true
-    } else {
-        return false
-    }
-}
-
-export const stripeCustomerExist = async (userId: string) => {
-    const result = await db.select()
-        .from(stripeCustomer)
-        .where(eq(stripeCustomer.stripeCustomerId, userId))
-
-    if (result) {
-        return true
-    } else {
-        return false
-    }
-}
-
-export const PUT = async (req: NextRequest) => {
+export const POST = async (req: NextRequest) => {
     try {
         const { userId } = auth();
         const user = await currentUser()
@@ -51,33 +32,27 @@ export const PUT = async (req: NextRequest) => {
                 price_data: {
                     currency: "USD",
                     product_data: {
-                        name: "10,000 AI Credit",
-                        description: "all $10 worth of credit",
+                        name: "10000 AI Credit",
+                        description: "$9.99/Month",
                     },
-                    unit_amount: 100000,
+                    unit_amount: 1000,
                 },
             },
         ];
         const data = await req.json()
-        const { date, plan } = data
+        const { date } = data
         const emailAddress = user?.primaryEmailAddress?.emailAddress
+        const fullName = user?.fullName
 
         // console.log("--- Email Address ->", emailAddress)
-        const premiumUserCheck = premiumUserExit(userId)
-        if (!premiumUserCheck) {
+        const premiumUserCheck = await premiumUserExit(userId)
+        console.log('premiumUserCheck->', premiumUserCheck[0].plan)
+        if (premiumUserCheck[0].plan==="free" ) {
             const customer = await stripe.customers.create({
                 email: emailAddress
             })
-            const dbResult = await db.insert(premiumUser).values({
-                userId: userId,
-                email: emailAddress,
-                userName: user?.fullName,
-                active: true,
-                joinDate: date,
-                plan: plan,
-                totalCredit: 100000,
-                stripeCustomerId: customer.id
-            })
+            console.log("customer->", customer)
+            
 
             // return Response.json({ dbResult })
 
@@ -85,15 +60,16 @@ export const PUT = async (req: NextRequest) => {
 
             const env = process.env.NODE_ENV
             let env_success_url, env_cancel_url
-            if (env == "development") {
+            if (env === "development") {
                 env_success_url = `http://localhost:3000/dashboard`
                 env_cancel_url = `http://localhost:3000/`
             }
-            else if (env == "production") {
+            else if (env === "production") {
                 env_success_url = `http://ai-content-generator.vercel.app/dashboard/`
                 env_cancel_url = `http://ai-content-generator.vercel.app/`
             }
-
+            console.log('--- before session----')
+            console.log( userId)
             const session = await stripe.checkout.sessions.create({
                 customer: customer.id,
                 line_items,
@@ -104,17 +80,17 @@ export const PUT = async (req: NextRequest) => {
                     userId: userId,
                 },
             });
-            return NextResponse.json({ url: session.url });
+            
+            console.log(session)
 
-            // const stripCustomerCheck = stripeCustomerExist(userId)
-            // if (!stripCustomerCheck) {
-            //     const customer = await stripe.customers.create({
-            //         email: emailAddress
-            //     })
-            //     const dbResult = await db.insert(stripeCustomer).values({
-            //         userId: userId,
-            //         stripeCustomerId: customer.id
-            //     })
+            
+            const customerId=customer.id
+            const createAt = moment().format('YYYY/MM/DD')
+            const remainingCredits = 0
+            const dbResult = await upgradeToPaid(userId, premiumUserCheck[0].totalCredit+100000, customerId, createAt, 'basic', true)
+            // const dbResult = await insertPremiumUser(userId, emailAddress, customerId, fullName, createAt)
+            console.log(dbResult)
+            return NextResponse.json({ url: session.url, result:dbResult });
         }
 
         return NextResponse.json({ premiumUser: premiumUserCheck });

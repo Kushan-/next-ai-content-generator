@@ -16,9 +16,6 @@ const History = async() => {
 
   return (
     <div>
-      <h2>HistoryPAge</h2>
-
-      <h3>{userEmailId}</h3>
       <UserContentHistory userEmailId={userEmailId}/>
     </div>
   )
