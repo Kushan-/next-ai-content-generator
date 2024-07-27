@@ -21,7 +21,7 @@ export const upgradeToPaid = async(userId:string, remainingCredits:number, strip
         
         totalCredit:remainingCredits,
         plan:plan,
-        active:active,
+        active:true,
         stripeCustomerId:stripeCustomerId,
         joinDate:createAt
 
@@ -66,7 +66,7 @@ export const insertPremiumUser= async(userId: string, emailAddress: string | und
     return(dbResult)
 }
 
-
+// after evry ai response use
 export const updateUserCredit = async(userId:string, remainingCredits:number )=>{
     const result = await db.update(premiumUser)
     .set({

@@ -10,9 +10,9 @@ import { premiumUserExit, insertPremiumUser, updateUserCredit} from "@/lib/dbUti
 import moment from "moment";
 
 export const PUT = async (req: NextRequest) => {
-    const {userId, } = auth()
+    const {userId,} = auth()
     const user=await currentUser();
-
+    
     console.log("userId ->", userId)
     console.log('user->', currentUser())
     if(!userId){
@@ -81,7 +81,7 @@ export const POST = async (req: NextRequest) => {
         if(premiumUserExitCheck!== false){
             const dbResult = premiumUserExitCheck
             console.log(dbResult)
-            return NextResponse.json({totalRemainingCredits : dbResult[0].totalCredit, params:"initiate"})
+            return NextResponse.json({totalRemainingCredits : dbResult[0].totalCredit, params:"initiate", active:dbResult[0].active, plan:dbResult[0].plan, date:dbResult[0].joinDate })
         }
         else if(premiumUserExitCheck === false){
             const createAt = moment().format('YYYY/MM/DD')

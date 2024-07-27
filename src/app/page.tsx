@@ -1,7 +1,9 @@
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button"
+
 import Link from "next/link";
+import { Auth } from "./_components/Auth";
 
 
 export default function Home() {
@@ -12,7 +14,7 @@ export default function Home() {
         <header className="px-4 mt-5 lg:px-6 h-14 flex items-center">
           {/* <Logo /> */}
           <nav className="ml-auto hidden lg:flex gap-4 sm:gap-6">
-            {/* <Auth /> */}
+            <Auth />
           </nav>
         </header>
         <main className="flex-1">

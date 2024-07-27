@@ -15,9 +15,13 @@ import { Button } from "@/components/ui/button";
 import { useUser } from '@clerk/clerk-react'
 import moment from 'moment'
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { is } from "drizzle-orm";
 
 const SubscribePage = () => {
-
+  const isSubscribed = useSelector((state) => {
+    return state.userSubs.active
+  })
   const [purchaseErr, setPuchaseErr] = useState("")
   const router = useRouter();
   const { user }: any = useUser()
@@ -35,23 +39,23 @@ const SubscribePage = () => {
     const response = await fetch("/api/upgrade/", {
       method: 'POST',
       body: JSON.stringify(payload),
-    }).then((res) => res.json()).then(data=>{
-      if(data.url){
+    }).then((res) => res.json()).then(data => {
+      if (data.url) {
         router.push(data.url)
-      }else{
-        let errorText=""
-        if(data.err.raw.code){
+      } else {
+        let errorText = ""
+        if (data.err.raw.code) {
           errorText = `${data.err.raw.code} error status code ${data.err.statusCode}`
         }
-        
-        if(data.err.raw.message){
+
+        if (data.err.raw.message) {
           errorText = `${data.err.raw.message} error status code ${data.err.statusCode}`
-        }else{
-          errorText=`error status code ${data.err.statusCode}`
+        } else {
+          errorText = `error status code ${data.err.statusCode}`
         }
         setPuchaseErr(errorText)
       }
-      
+
     })
   }
 
@@ -79,15 +83,17 @@ const SubscribePage = () => {
               </p>
             </div>
             <div className="flex flex-col space-y-5">
-            <Button className="mt-5" onClick={handleOnClick}>
-              Purchase
-            </Button>
-            {
-              purchaseErr?<span className="bg-red-500 text-white">{purchaseErr}</span>:null
-            }
+              {isSubscribed ? <Button className="mt-s bg-green-300">Subscribed Already</Button> :
+                <Button className="mt-5" onClick={handleOnClick}>
+                  Purchase
+                </Button>
+              }
+              {
+                purchaseErr ? <span className="bg-red-500 text-white">{purchaseErr}</span> : null
+              }
             </div>
-          
-            
+
+
           </CardContent>
         </Card>
       </div>

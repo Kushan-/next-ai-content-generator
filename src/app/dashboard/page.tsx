@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import SearchSection from './_components/SearchSection'
 import TemplateListSection from './_components/TemplateListSection'
-import { historyAction } from '../../store';
+import { historyAction, userSubscriptionAction } from '../../store';
 import { useUser } from "@clerk/clerk-react"
 
 const DashboardPage = () => {
@@ -32,6 +32,9 @@ const DashboardPage = () => {
         console.log(data)
         if (!data.err) {
           dispatch(historyAction.updateCreditUsage({ totalRemainingCredits: data.totalRemainingCredits, params: "initiate" }))
+          dispatch(userSubscriptionAction.updateUserSubscription({plan:data.plan,
+            active:data.active,
+          date:data.date}))
         }
       })
     }

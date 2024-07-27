@@ -19,7 +19,7 @@ export const premiumUser = pgTable('premiumUser',{
     joinDate:varchar('joinData'),
     plan:varchar('plan'),
     totalCredit:integer('totalCredit').default(0),
-    stripeCustomerId:varchar('stripeCustomerId')
+    stripeCustomerId:varchar('stripeCustomerId'),
 })
 
 export const stripeCustomer = pgTable('stripeCustomer',{

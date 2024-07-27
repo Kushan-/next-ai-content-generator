@@ -30,6 +30,20 @@ const userHistorySlice = createSlice({
 
 })
 
+const userSubscription = {plan: 'free', active:false, date:null, }
+
+const userSubscriptionSlice = createSlice({
+    name:'userSubs',
+    initialState: userSubscription,
+    reducers: {
+        updateUserSubscription(state, action){
+            state.plan = action.payload.plan
+            state.active = action.payload.active
+            state.date = action.payload.date
+        }
+    }
+})
+
 const initialAiResponse = { aiResponseContent: '', }
 
 const aiResponseSlice = createSlice({
@@ -60,15 +74,16 @@ const authSlice = createSlice({
 
 const reduxStore = configureStore({
     reducer: {
-
         auth: authSlice.reducer,
         history: userHistorySlice.reducer,
-        aiResponse: aiResponseSlice.reducer
+        aiResponse: aiResponseSlice.reducer,
+        userSubs:userSubscriptionSlice.reducer
     }
 })
 
 export const historyAction = userHistorySlice.actions
 export const aiResponseAction = aiResponseSlice.actions
+export const userSubscriptionAction = userSubscriptionSlice.actions
 export const authAction = authSlice.actions
 
 export default reduxStore

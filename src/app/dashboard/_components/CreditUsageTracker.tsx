@@ -1,12 +1,13 @@
-import { Button } from '@/components/ui/button'
+"use client"
+import { useRouter } from "next/navigation";
+// import { useRouter } from 'next/router'
 import { useUser } from '@clerk/clerk-react'
 import { useSelector, useDispatch } from 'react-redux';
+// import { useRouter } from 'next/router';
 
-//import { historyAction } from '../../../store';
-//import { aiOutputSchema } from '../../api/pgOperation/schema'
-// import { eq } from 'drizzle-orm'
-// import { db } from '../../api/pgOperation/db'
-import { useEffect, useState } from 'react'
+
+import { Button } from '@/components/ui/button'
+import UsageChart from './UsageChart'
 
 interface ENTERIES {
     'aiResponse': string
@@ -23,32 +24,38 @@ interface DATA {
 }
 
 const CreditUsageTracker = (props: any) => {
+    const router = useRouter()
     const dispatch = useDispatch()
     const { user } = useUser()
-    const [totalUsage, setTotalUsage] = useState<number>(0)
+
+    const isSubscribed = useSelector((state) => {
+        return state.userSubs.active
+    })
+    const renewalDate = useSelector((state)=>{
+        return state.userSubs.date
+    })
     const remainingCredit = useSelector((state) => {
         return state.history.userCreditUsage
     })
+
+    
     console.log("credit usage tracker->, ", remainingCredit)
 
     return (
         <div className='m-5'>
+            <h3 className="text-center">
+                Credit Usage
+            </h3>
+            <div className='text-center text-black rounded-lg text-pretty text-bol'>
             {remainingCredit}
-            {/* <div className='bg-primary text-white p-3 rounded-lg'>
-                <h2 className='font-medium'>
-                    Credits            </h2>
-                <div className='h-2 bg-[#896ff9] w-full rounded-full mt-3'>
-                    <div className='h2 bg-[#aaa1d0] rounded-full' style={{ width: (totalUsage / 10000) * 100 + '%' }}
-
-                    >
-
-
-                    </div>
-
-                </div>
-                <h2 className='text-snall my-2'>{totalUsage}/10000 Credits Used</h2>
             </div>
-            <Button variant={'secondary'} className='w-full my-3 text-primary'>Upgrade</Button> */}
+            {
+                isSubscribed?<Button className="text-green-200 text-pretty p-2">Renewal date a month {renewalDate} after</Button>:
+                <Button variant={'secondary'} className='w-full my-3 text-primary'  onClick={() => router.push('/dashboard/subscribe')}>Upgrade</Button>
+            }
+            {/* <UsageChart/> */}
+            
+           
         </div>
     )
 }
