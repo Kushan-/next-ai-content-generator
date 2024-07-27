@@ -57,7 +57,7 @@ export const POST = async (req: NextRequest) => {
         // console.log("--- Email Address ->", emailAddress)
         const premiumUserCheck = await premiumUserExit(userId)
         if (premiumUserCheck) {
-            const premiumUserData : PREMIUMUSERDATA= await getPremiumUser(userId)
+            const premiumUserData : any= await getPremiumUser(userId)
             const customer = await stripe.customers.create({
                 email: emailAddress
             })
