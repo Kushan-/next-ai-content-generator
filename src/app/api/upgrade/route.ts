@@ -5,13 +5,23 @@ import { auth, currentUser } from "@clerk/nextjs/server"
 import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm';
 import { premiumUser, stripeCustomer } from '@/lib/schema'
-import { insertPremiumUser, upgradeToPaid,premiumUserExit, stripeCustomerExist } from "@/lib/dbUtils";
+import { insertPremiumUser, upgradeToPaid,premiumUserExit, stripeCustomerExist, getPremiumUser } from "@/lib/dbUtils";
 import moment from "moment";
 import { Result } from "postcss";
 import { STRIPE_WEBHOOK_ENPOINT_KEY } from "../../../../utils/envConfig";
 import { STRIPE_PASS_KEY } from "../../../../utils/envConfig";
 
-
+interface PREMIUMUSERDATA {
+    id:string
+    userId:string
+    email: string
+    userName:string
+    active:boolean
+    joinDate:string
+    plan:string
+    totalCredit:number
+    stripeCustomerId:string,
+}
 
 console.log("stripe pass key", process.env.STRIPE_PASS_KEY, STRIPE_PASS_KEY) 
 const stripe = new Stripe(STRIPE_PASS_KEY as string, {
@@ -46,8 +56,8 @@ export const POST = async (req: NextRequest) => {
 
         // console.log("--- Email Address ->", emailAddress)
         const premiumUserCheck = await premiumUserExit(userId)
-        console.log('premiumUserCheck->', premiumUserCheck[0].plan)
-        if (premiumUserCheck[0].plan==="free" ) {
+        if (premiumUserCheck) {
+            const premiumUserData : PREMIUMUSERDATA= await getPremiumUser(userId)
             const customer = await stripe.customers.create({
                 email: emailAddress
             })
@@ -87,7 +97,7 @@ export const POST = async (req: NextRequest) => {
             const customerId=customer.id
             const createAt = moment().format('YYYY/MM/DD')
             const remainingCredits = 0
-            const dbResult = await upgradeToPaid(userId, premiumUserCheck[0].totalCredit+100000, customerId, createAt, 'basic', true)
+            const dbResult = await upgradeToPaid(userId, premiumUserData[0].totalCredit+100000, customerId, createAt, 'basic', true)
             // const dbResult = await insertPremiumUser(userId, emailAddress, customerId, fullName, createAt)
             console.log(dbResult)
             return NextResponse.json({ url: session.url, result:dbResult });

@@ -2,14 +2,23 @@ import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm';
 import { premiumUser, stripeCustomer } from '@/lib/schema'
 
-
-export const premiumUserExit = async (userId:string) => {
+export const getPremiumUser = async (userId:string) => {
     const result = await db.select()
         .from(premiumUser)
         .where(eq(premiumUser.userId, userId))
 
     if (result.length>0) {
         return result
+    } else {
+        return []
+    }
+}
+
+export const premiumUserExit = async (userId:string) => {
+    const result = await getPremiumUser(userId)
+
+    if (result.length>0) {
+        return true
     } else {
         return false
     }
