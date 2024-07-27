@@ -11,7 +11,7 @@ const DashboardPage = () => {
   const { user } = useUser()
   const userId = user?.id
   const userEmailId = user?.primaryEmailAddress?.emailAddress
-  //console.log('->>>>', userId, userEmailId)
+  
   const dispatch = useDispatch()
   const [userSearchInput, setUserSearchInput] = useState<string>()
 

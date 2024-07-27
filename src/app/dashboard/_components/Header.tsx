@@ -4,11 +4,19 @@ import React from 'react'
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { useSelector } from 'react-redux'
 import { UserButton } from '@clerk/clerk-react'
+import { useUser } from "@clerk/clerk-react"
+
 
 const Header = () => {
   const isSubscribed = useSelector((state) => {
     return state.userSubs.active
   })
+  const { user } = useUser()
+  const userId = user?.id
+  const userEmailId = user?.primaryEmailAddress?.emailAddress
+  const userFullName = user?.fullName
+  
+  
   // const {userId } = auth()
 
   // const getUsername = async() =>{
@@ -21,9 +29,10 @@ const Header = () => {
   return (
     <div className='p-5 shadow-sm border-b-2 flex justify-between items-center bg-white'>
       <div className='flex gap-2 items-center p-2 border rounded-md max-w-md bg-white'>
+
         {/* <Search/> */}
         {/* <input type='text' placeholder='Search...' className='outline-none'/> */}
-        {/* {`Welcome! ${userFullName}`} */}
+        <h2>{`Welcome! ${userFullName}`}</h2>
         {/* <Auth /> */}
 
       </div>

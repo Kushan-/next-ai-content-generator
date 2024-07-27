@@ -5,7 +5,7 @@ import { db } from '../../../lib/db'
 import { aiOutputSchema, premiumUser } from '../../../lib/schema'
 import { eq } from 'drizzle-orm';
 import { auth, currentUser } from "@clerk/nextjs/server"
-import { premiumUserExit, insertPremiumUser, updateUserCredit} from "@/lib/dbUtils";
+import { premiumUserExit, insertPremiumUser, updateUserCredit, getPremiumUser} from "@/lib/dbUtils";
 
 import moment from "moment";
 
@@ -78,8 +78,8 @@ export const POST = async (req: NextRequest) => {
         // check to see if user is new or login token expired
         const premiumUserExitCheck = await premiumUserExit(userId)
         console.log(premiumUserExitCheck)
-        if(premiumUserExitCheck!== false){
-            const dbResult = premiumUserExitCheck
+        if(premiumUserExitCheck){
+            const dbResult = await getPremiumUser(userId)
             console.log(dbResult)
             return NextResponse.json({totalRemainingCredits : dbResult[0].totalCredit, params:"initiate", active:dbResult[0].active, plan:dbResult[0].plan, date:dbResult[0].joinDate })
         }
