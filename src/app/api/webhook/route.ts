@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
         try {
             const stripeCustomer = await stripeCustomerExist(stripeUserId)
             if (stripeCustomer) {
-                return NextResponse.json({ status: "existing stipe Customer" }, { "events": event.type });
+                return NextResponse.json({ status: "existing stipe Customer" , "events": event.type });
             } else {
                 // const email = sessionEvent?.billin.email
                 const amount = sessionEvent.amount_total
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
 
 
             }
-            return NextResponse.json({ status: "success" }, { "events": event.type });
+            return NextResponse.json({ status: "success" , "events": event.type });
         } catch (error) {
             return new NextResponse("Invalid User not authorized", { status: 500 });
         }
