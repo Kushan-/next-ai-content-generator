@@ -11,6 +11,7 @@ const layout = ( {children} : Readonly<{children:React.ReactNode}> ) => {
     <Provider store={reduxStore}>
     <div className='bg-slate-50 h-screen'>
         <div className='md:w-64 hidden md:block fixed'>
+            
             <SideNav/>
         </div>
         <div className='md:ml-64'>

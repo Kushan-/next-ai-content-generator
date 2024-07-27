@@ -3,6 +3,7 @@ import { Search } from 'lucide-react'
 import React from 'react'
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { useSelector } from 'react-redux'
+import { UserButton } from '@clerk/clerk-react'
 
 const Header = () => {
   const isSubscribed = useSelector((state) => {
@@ -27,13 +28,13 @@ const Header = () => {
 
       </div>
       <hr className='my-6 border' />
-      <div className='mt-3'>
+      <div className='flex gap-5 items-center'>
 
         <h2 className=' bg-primary p-1 rounded-full text-xs text-white px-2'>
           {isSubscribed ? `🔥 Thanks for a Premium Member 🔥 `: `🔥 Join Membership just for $9.99/Month 🔥`}
           
         </h2>
-
+        <UserButton/>
       </div>
     </div>
   )
