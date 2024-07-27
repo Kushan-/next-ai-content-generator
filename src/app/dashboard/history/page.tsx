@@ -6,17 +6,17 @@ const History = async() => {
   const user = await currentUser()
   // console.log("current user->", user)
   console.log(user?.fullName)
-  const userEmailId:string = user?.emailAddresses[0].emailAddress
-  const emailAddArray :Array<string>=  user?.emailAddresses
-  if(emailAddArray.length>1){
-    for (let email in emailAddArray){
-      console.log(email)
-    }
-  }
+  const userEmailId:string | undefined = user?.emailAddresses[0].emailAddress
+  // const emailAddArray :Array<string>=  user?.emailAddresses
+  // if(emailAddArray.length>1){
+  //   for (let email in emailAddArray){
+  //     console.log(email)
+  //   }
+  // }
 
   return (
     <div>
-      <UserContentHistory userEmailId={userEmailId}/>
+      <UserContentHistory />
     </div>
   )
 }

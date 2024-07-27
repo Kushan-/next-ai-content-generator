@@ -19,7 +19,7 @@ import moment from 'moment'
 import { chatSession } from '../../../../../utils/aiModel'
 
 
-
+import {STATEHISTORY} from '../../_components/CreditUsageTracker'
 
 interface PROPS {
   selectedTemplate?: TEMPLATE,
@@ -29,7 +29,7 @@ interface PROPS {
 
 const InputFormSection = ({ selectedTemplate, templateSlug }: PROPS) => {
   const dispatch = useDispatch()
-  const remainingCredits: number = useSelector((state) => state.history.userCreditUsage)
+  const remainingCredits: number = useSelector((state: STATEHISTORY) => state.history.userCreditUsage)
   const [error, setError] = useState("")
   const [formData, setFormData] = useState<any>();
   
@@ -147,7 +147,7 @@ const InputFormSection = ({ selectedTemplate, templateSlug }: PROPS) => {
 
     <div className='p-5 shadow-md border rounded-lg bg-white'>
 
-
+      {/*@ts-ignore*/ }
       <Image src={selectedTemplate?.icon}
         alt='icon'
         width={70}

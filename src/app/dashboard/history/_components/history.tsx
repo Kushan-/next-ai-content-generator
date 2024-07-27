@@ -20,8 +20,13 @@ import {
 } from "@/components/ui/table"
 import { Button } from '@/components/ui/button';
 
-interface PROPS {
-    userEmailId: string
+interface HISTORYSTATE {
+    id: string,
+    templateSlug:string,
+    formData:string,
+    aiResponse:string,
+    createdAt:string
+
 }
 
 interface ENTERIES {
@@ -91,7 +96,7 @@ const UserContentHistory = () => {
                     </TableHeader>
                     <TableBody>
                         {userHistory && userHistory.length > 0
-                            ? userHistory.map((history) => (
+                            ? userHistory.map((history:HISTORYSTATE) => (
                                 <TableRow key={history.id}>
                                     <TableCell>{history.templateSlug}</TableCell>
                                     <TableCell className="w-[250px]">{history.formData}</TableCell>

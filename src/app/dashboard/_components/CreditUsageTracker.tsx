@@ -9,13 +9,21 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Button } from '@/components/ui/button'
 import UsageChart from './UsageChart'
 
-interface ENTERIES {
-    'aiResponse': string
+
+export interface STATEUSERSUBS {
+    userSubs: {
+        active: boolean,
+        date: string,
+
+
+    }
 }
 
-interface STATE {
+
+export interface STATEHISTORY {
     history: {
-        updateCreditUsage: boolean
+
+        userCreditUsage:number
     }
 }
 
@@ -28,13 +36,13 @@ const CreditUsageTracker = (props: any) => {
     const dispatch = useDispatch()
     const { user } = useUser()
 
-    const isSubscribed = useSelector((state) => {
+    const isSubscribed = useSelector((state : STATEUSERSUBS) => {
         return state.userSubs.active
     })
-    const renewalDate = useSelector((state)=>{
+    const renewalDate = useSelector((state : STATEUSERSUBS)=>{
         return state.userSubs.date
     })
-    const remainingCredit = useSelector((state) => {
+    const remainingCredit = useSelector((state: STATEHISTORY) => {
         return state.history.userCreditUsage
     })
 

@@ -5,26 +5,17 @@ import { auth, currentUser } from "@clerk/nextjs/server"
 import { useSelector } from 'react-redux'
 import { UserButton } from '@clerk/clerk-react'
 import { useUser } from "@clerk/clerk-react"
+import {STATEUSERSUBS} from './CreditUsageTracker'
 
 
 const Header = () => {
-  const isSubscribed = useSelector((state) => {
+  const isSubscribed = useSelector((state:STATEUSERSUBS) => {
     return state.userSubs.active
   })
   const { user } = useUser()
   const userId = user?.id
   const userEmailId = user?.primaryEmailAddress?.emailAddress
   const userFullName = user?.fullName
-  
-  
-  // const {userId } = auth()
-
-  // const getUsername = async() =>{
-  //   const user= await currentUser()
-  //   return `${user?.firstName} ${user?.lastName}`
-  // }
-  // const userFullName = getUsername()
-
 
   return (
     <div className='p-5 shadow-sm border-b-2 flex justify-between items-center bg-white'>
@@ -32,8 +23,7 @@ const Header = () => {
 
         {/* <Search/> */}
         {/* <input type='text' placeholder='Search...' className='outline-none'/> */}
-        <h2>{`Welcome! ${userFullName}`}</h2>
-        {/* <Auth /> */}
+        <h2>{`👋💗 Welcome! ${userFullName} 👋🏻`}</h2>
 
       </div>
       <hr className='my-6 border' />

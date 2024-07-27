@@ -18,8 +18,10 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { is } from "drizzle-orm";
 
+import {STATEUSERSUBS} from '../../dashboard/_components/CreditUsageTracker'
+
 const SubscribePage = () => {
-  const isSubscribed = useSelector((state) => {
+  const isSubscribed = useSelector((state:STATEUSERSUBS) => {
     return state.userSubs.active
   })
   const [purchaseErr, setPuchaseErr] = useState("")
