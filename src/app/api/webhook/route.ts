@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripeCustomerExist, insertStripeCustomer} from "@/lib/dbUtils";
 import { STRIPE_WEBHOOK_SECRET_KEY } from "../../../../utils/envConfig";
@@ -23,7 +23,7 @@ const getStripeEvents = async (sessionEvent: any) => {
 
 }
 
-export async function POST(req: NextResponse) {
+export async function POST(req: NextRequest) {
     const body = await req.text();
 
     const resp = JSON.parse(body)
