@@ -1,7 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import {NEXT_GEMINI_API_KEY} from "./envConfig"
-
-const genAI = new GoogleGenerativeAI(NEXT_GEMINI_API_KEY);
+console.log(NEXT_GEMINI_API_KEY)
+const spiKey :string|undefined = NEXT_GEMINI_API_KEY
+/* @ts-ignore */
+const genAI = new GoogleGenerativeAI(spiKey);
 
 const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
