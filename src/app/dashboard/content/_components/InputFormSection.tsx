@@ -26,6 +26,9 @@ interface PROPS {
   templateSlug: string,
 
 }
+interface AIRESPONSE {
+  aiResponse: string
+}
 
 const InputFormSection = ({ selectedTemplate, templateSlug }: PROPS) => {
   const dispatch = useDispatch()
@@ -54,81 +57,101 @@ const InputFormSection = ({ selectedTemplate, templateSlug }: PROPS) => {
       const selectedPrompt = selectedTemplate?.aiPrompt;
       const finalAiPrompt = `${JSON.stringify(formData)},${selectedPrompt}`
       try {
-        const chatSessionResult = await chatSession.sendMessage(finalAiPrompt)
-        const chatSessionResponse = chatSessionResult.response.text()
-
-
-
-
-        if ((remainingCredits - chatSessionResponse.length) > 0) {
-
-          dispatch(aiResponseAction.updateAiResponse(chatSessionResponse))
-
-          // setAiContentResponse(chatSessionResponse)
-          // dispatch(historyAction.upadateCreaditUsage(true))
-          console.log(formData)
-
-
-          const aiContentPayload = {
-            finalAiPrompt,
-            formData,
-            templateSlug,
-            aiResponse: chatSessionResponse,
-            chatResponseLength: chatSessionResponse.length,
-            createdBy: userEmail,
-            createdAt: moment().format('yyyy/MM/DD'),
-            params: 'dbInertion',
-            responseLength: chatSessionResponse.length
+        // const chatSessionResult = await chatSession.sendMessage(finalAiPrompt)
+        // const chatSessionResponse = chatSessionResult.response.text()
+        const payload = {
+          params: 'generateAiResponse',
+          contentPayload: finalAiPrompt
+        }
+        console.log(payload)
+        const chatSessionResponse = await fetch('/api/geminiAi', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        }).then((res) => res.json()).then(data => {
+          console.log(data)
+          if(data.success){
+            
+          const chatSessionResponse = data.aIresponse
+          return chatSessionResponse
+          }else{
+            return data.err
           }
-          console.log(aiContentPayload)
+        })
 
-          const response = await fetch('/api/pgOperation', {
-            method: 'PUT',
-            body: JSON.stringify(aiContentPayload),
-            headers: {
-              'Content-Type': 'application/json'
-            },
+          if ((remainingCredits - chatSessionResponse.length) > 0) {
 
-          });
-          console.log(response.status)
-          if (response.status === 200) {
-            setLoadingAiResponse(false)
-            const storeAction = {
-              params: 'update',
+            dispatch(aiResponseAction.updateAiResponse(chatSessionResponse))
+
+            // setAiContentResponse(chatSessionResponse)
+            // dispatch(historyAction.upadateCreaditUsage(true))
+            //console.log(formData)
+
+
+            const aiContentPayload = {
+              finalAiPrompt,
+              formData,
+              templateSlug,
+              aiResponse: chatSessionResponse,
+              chatResponseLength: chatSessionResponse.length,
+              createdBy: userEmail,
+              createdAt: moment().format('yyyy/MM/DD'),
+              params: 'dbInertion',
               responseLength: chatSessionResponse.length
             }
+            // console.log(aiContentPayload)
 
-            dispatch(historyAction.updateCreditUsage(storeAction))
-
-
-            // update premium user db with remaining credits
-            const userCreditPayload = {
-              params: "updateUserCredits",
-              totalUserCreditLeft: remainingCredits - chatSessionResponse.length
-            }
-
-            await fetch('/api/pgOperation', {
-              method: 'POST',
-              body: JSON.stringify(userCreditPayload),
+            const response = await fetch('/api/pgOperation', {
+              method: 'PUT',
+              body: JSON.stringify(aiContentPayload),
               headers: {
                 'Content-Type': 'application/json'
               },
 
-            }).then((res) => res.json).then((data) => console.log(data))
+            });
+            console.log(response.status)
+            if (response.status === 200) {
+              setLoadingAiResponse(false)
+              const storeAction = {
+                params: 'update',
+                responseLength: chatSessionResponse.length
+              }
 
-            console.log(response)
+              dispatch(historyAction.updateCreditUsage(storeAction))
+
+
+              // update premium user db with remaining credits
+              const userCreditPayload = {
+                params: "updateUserCredits",
+                totalUserCreditLeft: remainingCredits - chatSessionResponse.length
+              }
+
+              fetch('/api/pgOperation', {
+                method: 'POST',
+                body: JSON.stringify(userCreditPayload),
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+
+              }).then((res) => res.json).then((data) => console.log(data))
+
+              console.log(response)
+            } else {
+              setLoadingAiResponse(true)
+              setError("Something went wrong , please try again")
+            }
+            // console.log("=========set Dispatch to FALSE===========")
+            //dispatch(historyAction.upadateCreaditUsage(false))
+
           } else {
-            setLoadingAiResponse(true)
-            setError("Something went wrong , please try again")
+            console.log(chatSessionResponse.length, remainingCredits)
+            setError(`your available credits are insufficient to cover the length of the response, Please upgrade`)
+
           }
-          // console.log("=========set Dispatch to FALSE===========")
-          //dispatch(historyAction.upadateCreaditUsage(false))
 
-        } else {
-          console.log(chatSessionResponse.length, remainingCredits)
-          setError(`your available credits are insufficient to cover the length of the response, Please upgrade`)
-
-        }
+      
       } catch (err) {
         console.log(err)
         setError(`AI error!`)

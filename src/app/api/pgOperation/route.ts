@@ -13,8 +13,8 @@ export const PUT = async (req: NextRequest) => {
     const {userId,} = auth()
     const user=await currentUser();
     
-    console.log("userId ->", userId)
-    console.log('user->', currentUser())
+    // console.log("userId ->", userId)
+    console.log('user->',  user)
     if(!userId){
         return new NextResponse("Unauthorized", { status: 401 });
     }
