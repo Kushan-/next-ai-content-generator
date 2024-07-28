@@ -12,6 +12,7 @@ const userHistorySlice = createSlice({
             console.log(`usercredit usage payload ${action.payload}`)
             state.toggleCreditHistoryUpdate = action.payload
         },
+        /* @ts-ignore */
         updateCreditUsage(state, action) {
             console.log("--- redux store-> updateCreditUsage----",action.payload)
             const params = action.payload.params
