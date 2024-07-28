@@ -19,7 +19,7 @@ import moment from 'moment'
 import { chatSession } from '../../../../../utils/aiModel'
 
 
-import {STATEHISTORY} from '../../_components/CreditUsageTracker'
+import { STATEHISTORY } from '../../_components/CreditUsageTracker'
 
 interface PROPS {
   selectedTemplate?: TEMPLATE,
@@ -32,7 +32,7 @@ const InputFormSection = ({ selectedTemplate, templateSlug }: PROPS) => {
   const remainingCredits: number = useSelector((state: STATEHISTORY) => state.history.userCreditUsage)
   const [error, setError] = useState("")
   const [formData, setFormData] = useState<any>();
-  
+
   const [loadingAiResponse, setLoadingAiResponse] = useState(false)
   // const [aiContentResponse, setAiContentResponse] = useState<string>()
   const { user }: any = useUser()
@@ -43,9 +43,9 @@ const InputFormSection = ({ selectedTemplate, templateSlug }: PROPS) => {
   const onSubmit = (e: any) => {
     e.preventDefault()
     console.log(formData)
-    console.log("==========================",remainingCredits)
+    console.log("==========================", remainingCredits)
     // const dispatch = useDispatch()
-    
+
 
     const generateAiContent = async (formData: any) => {
 
@@ -53,77 +53,85 @@ const InputFormSection = ({ selectedTemplate, templateSlug }: PROPS) => {
       setLoadingAiResponse(true)
       const selectedPrompt = selectedTemplate?.aiPrompt;
       const finalAiPrompt = `${JSON.stringify(formData)},${selectedPrompt}`
-      const chatSessionResult = await chatSession.sendMessage(finalAiPrompt)
-      const chatSessionResponse = chatSessionResult.response.text()
-
-      if ((remainingCredits - chatSessionResponse.length) > 0) {
-
-        dispatch(aiResponseAction.updateAiResponse(chatSessionResponse))
-
-        // setAiContentResponse(chatSessionResponse)
-        // dispatch(historyAction.upadateCreaditUsage(true))
-        console.log(formData)
+      try {
+        const chatSessionResult = await chatSession.sendMessage(finalAiPrompt)
+        const chatSessionResponse = chatSessionResult.response.text()
 
 
-        const aiContentPayload = {
-          finalAiPrompt,
-          formData,
-          templateSlug,
-          aiResponse: chatSessionResponse,
-          chatResponseLength: chatSessionResponse.length,
-          createdBy: userEmail,
-          createdAt: moment().format('yyyy/MM/DD'),
-          params: 'dbInertion',
-          responseLength: chatSessionResponse.length
-        }
-        console.log(aiContentPayload)
 
-        const response = await fetch('/api/pgOperation', {
-          method: 'PUT',
-          body: JSON.stringify(aiContentPayload),
-          headers: {
-            'Content-Type': 'application/json'
-          },
 
-        });
-        console.log(response.status)
-        if (response.status === 200) {
-          setLoadingAiResponse(false)
-          const storeAction = {
-            params: 'update',
+        if ((remainingCredits - chatSessionResponse.length) > 0) {
+
+          dispatch(aiResponseAction.updateAiResponse(chatSessionResponse))
+
+          // setAiContentResponse(chatSessionResponse)
+          // dispatch(historyAction.upadateCreaditUsage(true))
+          console.log(formData)
+
+
+          const aiContentPayload = {
+            finalAiPrompt,
+            formData,
+            templateSlug,
+            aiResponse: chatSessionResponse,
+            chatResponseLength: chatSessionResponse.length,
+            createdBy: userEmail,
+            createdAt: moment().format('yyyy/MM/DD'),
+            params: 'dbInertion',
             responseLength: chatSessionResponse.length
           }
-  
-          dispatch(historyAction.updateCreditUsage(storeAction))
-          
+          console.log(aiContentPayload)
 
-          // update premium user db with remaining credits
-          const userCreditPayload = {
-            params:"updateUserCredits",
-            totalUserCreditLeft:remainingCredits-chatSessionResponse.length
-          }
-
-          await fetch('/api/pgOperation', {
-            method: 'POST',
-            body: JSON.stringify(userCreditPayload),
+          const response = await fetch('/api/pgOperation', {
+            method: 'PUT',
+            body: JSON.stringify(aiContentPayload),
             headers: {
               'Content-Type': 'application/json'
             },
-  
-          }).then( (res)=>res.json).then((data)=>console.log(data))
-          
-          console.log(response)
+
+          });
+          console.log(response.status)
+          if (response.status === 200) {
+            setLoadingAiResponse(false)
+            const storeAction = {
+              params: 'update',
+              responseLength: chatSessionResponse.length
+            }
+
+            dispatch(historyAction.updateCreditUsage(storeAction))
+
+
+            // update premium user db with remaining credits
+            const userCreditPayload = {
+              params: "updateUserCredits",
+              totalUserCreditLeft: remainingCredits - chatSessionResponse.length
+            }
+
+            await fetch('/api/pgOperation', {
+              method: 'POST',
+              body: JSON.stringify(userCreditPayload),
+              headers: {
+                'Content-Type': 'application/json'
+              },
+
+            }).then((res) => res.json).then((data) => console.log(data))
+
+            console.log(response)
+          } else {
+            setLoadingAiResponse(true)
+            setError("Something went wrong , please try again")
+          }
+          // console.log("=========set Dispatch to FALSE===========")
+          //dispatch(historyAction.upadateCreaditUsage(false))
+
         } else {
-          setLoadingAiResponse(true)
-          setError("Something went wrong , please try again")
+          console.log(chatSessionResponse.length, remainingCredits)
+          setError(`your available credits are insufficient to cover the length of the response, Please upgrade`)
+
         }
-        // console.log("=========set Dispatch to FALSE===========")
-        //dispatch(historyAction.upadateCreaditUsage(false))
-
-      } else {
-        console.log(chatSessionResponse.length, remainingCredits)
-        setError(`your available credits are insufficient to cover the length of the response, Please upgrade`)
-
+      } catch (err) {
+        console.log(err)
+        setError(`AI error!`)
       }
     }
     generateAiContent(formData)
@@ -147,7 +155,7 @@ const InputFormSection = ({ selectedTemplate, templateSlug }: PROPS) => {
 
     <div className='p-5 shadow-md border rounded-lg bg-white'>
 
-      {/*@ts-ignore*/ }
+      {/*@ts-ignore*/}
       <Image src={selectedTemplate?.icon}
         alt='icon'
         width={70}
@@ -163,12 +171,12 @@ const InputFormSection = ({ selectedTemplate, templateSlug }: PROPS) => {
           </div>
         ))}
         {
-          error===""?  <Button type='submit'
-          disabled={loadingAiResponse}
-          className='w-full py-6'>{loadingAiResponse && <Loader2Icon className='animate-spin' />}generate Content</Button> : 
-          <Button variant="destructive">{error}</Button> 
+          error === "" ? <Button type='submit'
+            disabled={loadingAiResponse}
+            className='w-full py-6'>{loadingAiResponse && <Loader2Icon className='animate-spin' />}generate Content</Button> :
+            <Button variant="destructive">{error}</Button>
         }
-        
+
       </form>
 
 

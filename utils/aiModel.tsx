@@ -1,9 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import {NEXT_GEMINI_API_KEY} from "./envConfig"
-console.log(NEXT_GEMINI_API_KEY)
+
 const spiKey :string|undefined = NEXT_GEMINI_API_KEY
 /* @ts-ignore */
-const genAI = new GoogleGenerativeAI(spiKey);
+const genAI = new GoogleGenerativeAI(`${NEXT_GEMINI_API_KEY}`);
+console.log(`${NEXT_GEMINI_API_KEY} === AIzaSyA_O6NueMCSwXCTb14-DlV2_rPFgi5qTYA`)
+
+console.log('-------------NEXT_GEMINI_API_KEY---------------------')
+console.log(`NEXT_GEMINI_API_KEY->", ${typeof(NEXT_GEMINI_API_KEY)}, ${NEXT_GEMINI_API_KEY}`)
+console.log('-------------NEXT_GEMINI_API_KEY---------------------')
 
 const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",

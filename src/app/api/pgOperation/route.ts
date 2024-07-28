@@ -66,8 +66,8 @@ export const POST = async (req: NextRequest) => {
         const result = await db.select()
             .from(aiOutputSchema)
             .where(eq(aiOutputSchema.createdBy, email))
-        console.log(typeof(result))
-        console.log(result)
+        //console.log(typeof(result))
+        //console.log(result)
         return NextResponse.json(result)
     }
     
@@ -77,16 +77,16 @@ export const POST = async (req: NextRequest) => {
 
         // check to see if user is new or login token expired
         const premiumUserExitCheck = await premiumUserExit(userId)
-        console.log(premiumUserExitCheck)
+        // console.log(premiumUserExitCheck)
         if(premiumUserExitCheck){
             const dbResult = await getPremiumUser(userId)
-            console.log(dbResult)
+            // console.log(dbResult)
             return NextResponse.json({totalRemainingCredits : dbResult[0].totalCredit, params:"initiate", active:dbResult[0].active, plan:dbResult[0].plan, date:dbResult[0].joinDate })
         }
         else if(premiumUserExitCheck === false){
             const createAt = moment().format('YYYY/MM/DD')
             const dbResult = await insertPremiumUser(userId, undefined, null, null, createAt, "free", 10000)
-            console.log(dbResult)
+            // console.log(dbResult)
             return NextResponse.json({ totalRemainingCredits: 1000, result : dbResult, params:"initiate"})
         }
 
