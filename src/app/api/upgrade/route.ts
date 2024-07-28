@@ -11,6 +11,11 @@ import { Result } from "postcss";
 import { STRIPE_WEBHOOK_ENPOINT_KEY } from "../../../../utils/envConfig";
 import { STRIPE_PASS_KEY } from "../../../../utils/envConfig";
 
+import { ENV_PROD_SUCCESS_URL } from "../../../../utils/envConfig"
+import { ENV_PROD_CANCEL_URL} from "../../../../utils/envConfig"
+import { ENV_DEV_SUCCESS_URL} from "../../../../utils/envConfig"
+import { ENV_DEV_CANCEL_URL} from "../../../../utils/envConfig"
+
 interface PREMIUMUSERDATA {
     id:string
     userId:string
@@ -71,12 +76,12 @@ export const POST = async (req: NextRequest) => {
             const env = process.env.NODE_ENV
             let env_success_url, env_cancel_url
             if (env === "development") {
-                env_success_url = `http://localhost:3000/dashboard`
-                env_cancel_url = `http://localhost:3000/`
+                env_success_url = ENV_DEV_SUCCESS_URL
+                env_cancel_url = ENV_DEV_CANCEL_URL
             }
             else if (env === "production") {
-                env_success_url = `http://ai-content-generator.vercel.app/dashboard/`
-                env_cancel_url = `http://ai-content-generator.vercel.app/`
+                env_success_url = ENV_PROD_SUCCESS_URL //`http://ai-content-generator.vercel.app/dashboard/`
+                env_cancel_url = ENV_PROD_CANCEL_URL //`http://ai-content-generator.vercel.app/`
             }
             console.log('--- before session----')
             console.log( userId)

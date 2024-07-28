@@ -18,6 +18,8 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
+
+import { STATEUSERSUBS, STATEHISTORY } from "./CreditUsageTracker"
 const chartData = [{ month: "january", desktop: 1260, mobile: 570 }]
 
 const chartConfig = {
@@ -38,11 +40,11 @@ const UsageChart = () => {
 
 
 
-    const remainingCredit = useSelector((state) => {
+    const remainingCredit = useSelector((state:STATEHISTORY) => {
         return state.history.userCreditUsage
     })
 
-    const isSubs = useSelector((state) => {
+    const isSubs = useSelector((state:STATEUSERSUBS) => {
         if (state.userSubs.plan === "free") {
             return 100000
         }

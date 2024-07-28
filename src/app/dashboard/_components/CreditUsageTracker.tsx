@@ -14,6 +14,7 @@ export interface STATEUSERSUBS {
     userSubs: {
         active: boolean,
         date: string,
+        plan:string,
 
 
     }
