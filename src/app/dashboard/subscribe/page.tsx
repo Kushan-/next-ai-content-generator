@@ -69,7 +69,7 @@ const SubscribePage = () => {
       <div className="mt-5 py-6 px-4 rounded">
         <Card className="w-[350px] flex flex-col mx-auto">
           <CardHeader>
-            <CardTitle>$9.99/Moth</CardTitle>
+            <CardTitle>$9.99/Month</CardTitle>
             <CardDescription>100000 AI Credit</CardDescription>
           </CardHeader>
           <CardContent>
