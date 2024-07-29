@@ -30,7 +30,7 @@ export const upgradeToPaid = async(userId:string, remainingCredits:number, strip
         
         totalCredit:remainingCredits,
         plan:plan,
-        active:true,
+        active:false,
         stripeCustomerId:stripeCustomerId,
         joinDate:createAt
 

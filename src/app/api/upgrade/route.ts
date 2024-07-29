@@ -85,17 +85,17 @@ export const POST = async (req: NextRequest) => {
 
 
             const env = process.env.NODE_ENV
-            let env_success_url = `${protocol}://${hostname}:${port}/dashboard`,
-            env_cancel_url = `${protocol}://${hostname}:${port}/`
-
-            // if (env === "development") {
-            //     env_success_url = ENV_DEV_SUCCESS_URL
-            //     env_cancel_url = ENV_DEV_CANCEL_URL
-            // }
-            // else if (env === "production") {
-            //     env_success_url = ENV_PROD_SUCCESS_URL //`http://ai-content-generator.vercel.app/dashboard/`
-            //     env_cancel_url = ENV_PROD_CANCEL_URL //`http://ai-content-generator.vercel.app/`
-            // }
+            let env_success_url, env_cancel_url
+            if (env === "development") {
+                env_success_url = `${protocol}//${hostname}:${port}/dashboard`
+                env_cancel_url = `${protocol}//${hostname}:${port}/`
+            }
+            else if (env === "production") {
+                env_success_url = `${protocol}//${hostname}/dashboard`
+                env_cancel_url = `${protocol}//${hostname}/`
+                // env_success_url = ENV_PROD_SUCCESS_URL //`http://ai-content-generator.vercel.app/dashboard/`
+                // env_cancel_url = ENV_PROD_CANCEL_URL //`http://ai-content-generator.vercel.app/`
+            }
             console.log('--- before session----')
 
             console.info("env_success_url->", env_success_url)
@@ -117,9 +117,9 @@ export const POST = async (req: NextRequest) => {
             const customerId = customer.id
             const createAt = moment().format('YYYY/MM/DD')
             const remainingCredits = 0
-            const dbResult = await upgradeToPaid(userId, premiumUserData[0].totalCredit + 100000, customerId, createAt, 'basic', true)
+            const dbResult = await upgradeToPaid(userId, premiumUserData[0].totalCredit + 100000, customerId, createAt, 'free', true)
             // const dbResult = await insertPremiumUser(userId, emailAddress, customerId, fullName, createAt)
-            console.log(dbResult)
+            // console.info('upgradeToPaid->', dbResult)
             return NextResponse.json({ url: session.url, result: dbResult });
         }
 
