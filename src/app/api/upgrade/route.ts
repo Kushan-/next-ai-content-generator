@@ -86,14 +86,14 @@ export const POST = async (req: NextRequest) => {
             let env_success_url = `${protocol}://${hostname}/dashboard`,
             env_cancel_url = `${protocol}://${hostname}/`
 
-            if (env === "development") {
-                env_success_url = ENV_DEV_SUCCESS_URL
-                env_cancel_url = ENV_DEV_CANCEL_URL
-            }
-            else if (env === "production") {
-                env_success_url = ENV_PROD_SUCCESS_URL //`http://ai-content-generator.vercel.app/dashboard/`
-                env_cancel_url = ENV_PROD_CANCEL_URL //`http://ai-content-generator.vercel.app/`
-            }
+            // if (env === "development") {
+            //     env_success_url = ENV_DEV_SUCCESS_URL
+            //     env_cancel_url = ENV_DEV_CANCEL_URL
+            // }
+            // else if (env === "production") {
+            //     env_success_url = ENV_PROD_SUCCESS_URL //`http://ai-content-generator.vercel.app/dashboard/`
+            //     env_cancel_url = ENV_PROD_CANCEL_URL //`http://ai-content-generator.vercel.app/`
+            // }
             console.log('--- before session----')
             console.log(userId)
             const session = await stripe.checkout.sessions.create({
