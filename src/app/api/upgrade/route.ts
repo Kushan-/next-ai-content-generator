@@ -38,6 +38,8 @@ export const POST = async (req: NextRequest) => {
     const pathname = req.nextUrl.pathname
     const hostname = req.nextUrl.hostname
     const protocol = req.nextUrl.protocol
+    const port = req.nextUrl.port
+
     console.info("basePath - > ", req.nextUrl.basePath)
     console.info("pathname - > ", req.nextUrl.pathname)
     console.info("hostname - > ", req.nextUrl.hostname)
@@ -83,8 +85,8 @@ export const POST = async (req: NextRequest) => {
 
 
             const env = process.env.NODE_ENV
-            let env_success_url = `${protocol}://${hostname}/dashboard`,
-            env_cancel_url = `${protocol}://${hostname}/`
+            let env_success_url = `${protocol}://${hostname}:${port}/dashboard`,
+            env_cancel_url = `${protocol}://${hostname}:${port}/`
 
             // if (env === "development") {
             //     env_success_url = ENV_DEV_SUCCESS_URL
@@ -95,7 +97,9 @@ export const POST = async (req: NextRequest) => {
             //     env_cancel_url = ENV_PROD_CANCEL_URL //`http://ai-content-generator.vercel.app/`
             // }
             console.log('--- before session----')
-            console.log(userId)
+
+            console.info("env_success_url->", env_success_url)
+            console.info("env_cancel_url->", env_cancel_url)
             const session = await stripe.checkout.sessions.create({
                 customer: customer.id,
                 line_items,
@@ -123,6 +127,7 @@ export const POST = async (req: NextRequest) => {
 
 
     } catch (error) {
+        console.error(error)
         return NextResponse.json({ err: error });
 
     }
