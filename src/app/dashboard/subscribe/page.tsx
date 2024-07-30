@@ -46,8 +46,11 @@ const SubscribePage = () => {
         router.push(data.url)
       } else {
         let errorText = ""
-        if (data.err.raw.code) {
+        console.log(data.err)
+        if (data.err.raw) {
           errorText = `${data.err.raw.code} error status code ${data.err.statusCode}`
+        }else{
+          errorText = `${data.err} error status code ${data.err.statusCode}`
         }
 
         if (data.err.raw.message) {

@@ -2,7 +2,7 @@ import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm';
 import { premiumUser, stripeCustomer } from '@/lib/schema'
 
-export const getPremiumUser = async (userId:string) => {
+export const getPremiumUserOnClearkId = async (userId:string) => {
     const result = await db.select()
         .from(premiumUser)
         .where(eq(premiumUser.userId, userId))
@@ -14,8 +14,20 @@ export const getPremiumUser = async (userId:string) => {
     }
 }
 
+export const getPremiumUserOnStripeCustomerId = async (stripeCustomerId:string) => {
+    const result = await db.select()
+        .from(premiumUser)
+        .where(eq(premiumUser.stripeCustomerId, stripeCustomerId))
+
+    if (result.length>0) {
+        return result
+    } else {
+        return []
+    }
+}
+
 export const premiumUserExit = async (userId:string) => {
-    const result = await getPremiumUser(userId)
+    const result = await getPremiumUserOnClearkId(userId)
 
     if (result.length>0) {
         return true
@@ -24,13 +36,14 @@ export const premiumUserExit = async (userId:string) => {
     }
 }
 
-export const upgradeToPaid = async(userId:string, remainingCredits:number, stripeCustomerId:string, createAt:string, plan:any, active:any, )=>{
+export const upgradeToPaid = async(userId:string, remainingCredits:number, stripeCustomerId:string, createAt:string, plan:any, active:any, fullname:string | null )=>{
     const result = await db.update(premiumUser)
     .set({
         
         totalCredit:remainingCredits,
+        userName:fullname,
         plan:plan,
-        active:false,
+        active:active,
         stripeCustomerId:stripeCustomerId,
         joinDate:createAt
 
@@ -52,7 +65,7 @@ export const stripeCustomerExist = async (userId:string) => {
     }
 }
 
-export const insertStripeCustomer = async (stripeUserId: string, paymentMethodDetails: string, createdAt: string) => {
+export const insertStripeCustomer = async (stripeUserId: string, billingDetails:string, paymentMethodDetails: string, createdAt: string) => {
     await db.insert(stripeCustomer).values({
         stripeCustomerId:stripeUserId,
         billingDetails:null,
@@ -61,11 +74,11 @@ export const insertStripeCustomer = async (stripeUserId: string, paymentMethodDe
     })     
 }
 
-export const insertPremiumUser= async(userId: string, emailAddress: string | undefined, customerId: string | null, fullName: string | null | undefined, createAt: string, plan:string, totalCredit:number)=>{
+export const insertPremiumUser= async(userId: string, emailAddress: string | null, customerId: string|null, createAt: string, plan:string, totalCredit:number)=>{
     const dbResult = await db.insert(premiumUser).values({
         userId: userId,
         email: emailAddress,
-        userName: fullName,
+        userName: null,
         active: false,
         joinDate: createAt,
         plan: plan,
