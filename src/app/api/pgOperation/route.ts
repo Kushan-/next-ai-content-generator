@@ -5,7 +5,7 @@ import { db } from '../../../lib/db'
 import { aiOutputSchema, premiumUser } from '../../../lib/schema'
 import { eq } from 'drizzle-orm';
 import { auth, currentUser } from "@clerk/nextjs/server"
-import { premiumUserExit, insertPremiumUser, updateUserCredit, getPremiumUser} from "@/lib/dbUtils";
+import { premiumUserExit, insertPremiumUser, updateUserCredit, getPremiumUserOnClearkId} from "@/lib/dbUtils";
 
 import moment from "moment";
 
@@ -79,13 +79,13 @@ export const POST = async (req: NextRequest) => {
         const premiumUserExitCheck = await premiumUserExit(userId)
         // console.log(premiumUserExitCheck)
         if(premiumUserExitCheck){
-            const dbResult = await getPremiumUser(userId)
+            const dbResult = await getPremiumUserOnClearkId(userId)
             // console.log(dbResult)
             return NextResponse.json({totalRemainingCredits : dbResult[0].totalCredit, params:"initiate", active:dbResult[0].active, plan:dbResult[0].plan, date:dbResult[0].joinDate })
         }
         else if(premiumUserExitCheck === false){
             const createAt = moment().format('YYYY/MM/DD')
-            const dbResult = await insertPremiumUser(userId, undefined, null, null, createAt, "free", 10000)
+            const dbResult = await insertPremiumUser(userId, null, null, createAt, "free", 10000)
             // console.log(dbResult)
             return NextResponse.json({ totalRemainingCredits: 1000, result : dbResult, params:"initiate"})
         }
