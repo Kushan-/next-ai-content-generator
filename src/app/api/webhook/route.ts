@@ -25,6 +25,11 @@ const getStripeEvents = async (sessionEvent: any) => {
 
 }
 
+export const GET = async(req:NextRequest) =>{
+    console.log(req.body)
+    return NextResponse.json({ message: 'Listening to strip hooks' })
+}
+
 export async function POST(req: NextRequest) {
     const body = await req.text();
 
@@ -125,77 +130,3 @@ export async function POST(req: NextRequest) {
     }
 
 }
-//     if (event.type === "checkout.session.completed") {
-//         console.log("---------checkout session completed --------")
-//         const session = await stripe.checkout.sessions.retrieve(
-//             (event.data.object as Stripe.Checkout.Session).id,
-//             {
-//                 expand: ["line_items"],
-//             }
-//         );
-//         const customerId = session.customer as string;
-//         console.log(customerId)
-//         const customerDetails = session.customer_details;
-//         console.log('customerDetails -> ', customerDetails)
-
-//         console.log("---------checkout session completed --------")
-//     }
-//     if (event.type === "customer.subscription.deleted") {
-//         console.log("-------customer.subscription.deleted--------")
-
-
-//         console.log("-------customer.subscription.deleted--------")
-//     }
-//     if(event.type === "payment_intent.succeeded"){
-
-//     }
-//     // const sessionEvent = event.data.object as Stripe.Checkout.Session;
-//     // await getStripeEvents(sessionEvent)
-
-//     // console.log("-------- sessionEvent ------")
-//     // console.log(sessionEvent)
-//     // console.log("-------- sessionEvent ------")
-//     // charge.succeeded
-//     // payment_intent.succeeded
-//     // payment_intent.created
-
-
-// } catch (err) {
-//     console.log("-------customer.subscription.deleted--------")
-//     console.error(err)
-//     return NextResponse.json({ error: err }, { status: 400 });
-// }
-
-// const sessionEvent = event.data.object as Stripe.Checkout.Session;
-
-// const stripeUserId = sessionEvent.id
-// console.log(stripeUserId, 'stripeUserId')
-// if (event.type === "checkout.session.completed") {
-//     if (!stripeUserId) {
-//         return new NextResponse(`Invalid sesison stripeUserId ${stripeUserId} doesn't exist`, { status: 400 });
-//     }
-
-//     try {
-//         const stripeCustomer = await stripeCustomerExist(stripeUserId)
-//         if (stripeCustomer) {
-//             return NextResponse.json({ status: "existing stipe Customer", "events": event.type });
-//         } else {
-//             // const email = sessionEvent?.billin.email
-//             const amount = sessionEvent.amount_total
-//             const recepientEmail = sessionEvent.customer_email
-//             const recepientURL = sessionEvent.url
-//             const paymentMethodDetails = JSON.stringify(sessionEvent.payment_method_configuration_details)
-//             const recepientCurrency = sessionEvent.currency
-//             const createdAt = moment().format('yyyy/MM/DD')
-//             insertStripeCustomer(stripeUserId, paymentMethodDetails, createdAt)
-
-
-//         }
-//         return NextResponse.json({ status: "success", "events": event.type });
-//     } catch (error) {
-//         return new NextResponse("Invalid User not authorized", { status: 500 });
-//     }
-// } else {
-//     return new NextResponse("Invalid event", { status: 400 });
-// }
-// return new NextResponse("Success", { status: 200 });
