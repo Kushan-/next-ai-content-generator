@@ -96,7 +96,9 @@ export async function POST(req: NextRequest) {
                     const remainingCredits = getPremiumUserCredit[0].totalCredit
                     const stripeDbResult = await insertStripeCustomer(chargeSucceededId, chargeSucceededBillingDetails, "card", createAt)
                     console.log(stripeDbResult)
+                    // @ts-ignore
                     const result = getPremiumUserOnStripeCustomerId(customerId)
+                    // @ts-ignore
                     console.log(result[0])
                     // @ts-ignore
                     const premiumDbResult = await upgradeToPaid(result[0].userId, remainingCredits + 100000, chargeSucceededId, createAt, "basic", true, chargeSucceededName)
