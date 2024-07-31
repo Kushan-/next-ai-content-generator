@@ -1,11 +1,12 @@
 import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm';
 import { premiumUser, stripeCustomer } from '@/lib/schema'
+import { EmailAddress } from '@clerk/nextjs/server';
 
 export const getPremiumUserOnClearkId = async (userId:string) => {
     const result = await db.select()
         .from(premiumUser)
-        .where(eq(premiumUser.userId, userId))
+        .where(eq(premiumUser.clerkUserId, userId))
 
     if (result.length>0) {
         return result
@@ -36,18 +37,21 @@ export const premiumUserExit = async (userId:string) => {
     }
 }
 
-export const upgradeToPaid = async(userId:string, remainingCredits:number, stripeCustomerId:string, createAt:string, plan:any, active:any, fullname:string | null )=>{
+// on charge cutomer succeed
+export const upgradeToPaid = async({...payload} )=>{
+    console.log(payload)
+    const {totalCredit, plan, active, joinedDate, stripeCustomerId} = payload
     const result = await db.update(premiumUser)
     .set({
         
-        totalCredit:remainingCredits,
-        userName:fullname,
+        totalCredit:totalCredit,
+        // userName:fullname,
         plan:plan,
         active:active,
-        stripeCustomerId:stripeCustomerId,
-        joinDate:createAt
+        // stripeCustomerId:stripeCustomerId,
+        joinDate:joinedDate
 
-    }).where(eq(premiumUser.userId, userId))
+    }).where(eq(premiumUser.stripeCustomerId, stripeCustomerId))
         
     console.log(result)
     
@@ -65,20 +69,26 @@ export const stripeCustomerExist = async (userId:string) => {
     }
 }
 
-export const insertStripeCustomer = async (stripeUserId: string, billingDetails:string, paymentMethodDetails: string, createdAt: string) => {
-    await db.insert(stripeCustomer).values({
-        stripeCustomerId:stripeUserId,
-        billingDetails:null,
-        paymentMethod:paymentMethodDetails,
-        createdAt:createdAt
-    })     
+// on charge succeed
+export const insertStripeCustomer = async ({...dbPayload}) => {
+    const {chargeSucceedId, stripeCustomerId, billingDetails, paymentMethod, createAt} = dbPayload
+    const result=await db.insert(stripeCustomer).values({
+        chargeSucceedId:chargeSucceedId,
+        stripeCustomerId:stripeCustomerId,
+        billingDetails:billingDetails,
+        paymentMethod:paymentMethod,
+        createdAt:createAt
+    })
+    return result 
 }
 
-export const insertPremiumUser= async(userId: string, emailAddress: string | null, customerId: string|null, createAt: string, plan:string, totalCredit:number)=>{
+// on new User afte clerk auth
+export const insertPremiumUser= async({...dbPayload})=>{
+    const {userId, emailAddress, userName, createAt, plan, totalCredit, customerId} = dbPayload
     const dbResult = await db.insert(premiumUser).values({
-        userId: userId,
+        clerkUserId: userId,
         email: emailAddress,
-        userName: null,
+        userName: userName,
         active: false,
         joinDate: createAt,
         plan: plan,
@@ -96,8 +106,24 @@ export const updateUserCredit = async(userId:string, remainingCredits:number )=>
         totalCredit:remainingCredits,
 
 
-    }).where(eq(premiumUser.userId, userId))
+    }).where(eq(premiumUser.clerkUserId, userId))
         
     console.log(result)
     
+}
+
+export const upgradeUserSripeId = async(userId: string, stripeCustomerId:string) =>{
+    const result = await db.update(premiumUser)
+    .set({
+        
+        stripeCustomerId:stripeCustomerId,
+
+
+    }).where(eq(premiumUser.clerkUserId, userId))
+        
+    console.log(result)
+}
+// on strip user creation
+const updatePremiumUser = (stripeCustomerId:string, clerkUserId:string) =>{
+
 }
