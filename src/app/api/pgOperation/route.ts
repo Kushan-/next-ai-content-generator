@@ -54,6 +54,9 @@ export const POST = async (req: NextRequest) => {
     console.log("===================")
     const {userId} = auth()
     const user=await currentUser();
+    const userFullName = user?.fullName
+    const userEmail = user?.primaryEmailAddress?.emailAddress
+    // console.log(userEmail)
 
     if(!userId){
         return new NextResponse("Unauthorized", { status: 401 });
@@ -66,8 +69,6 @@ export const POST = async (req: NextRequest) => {
         const result = await db.select()
             .from(aiOutputSchema)
             .where(eq(aiOutputSchema.createdBy, email))
-        //console.log(typeof(result))
-        //console.log(result)
         return NextResponse.json(result)
     }
     
@@ -77,7 +78,8 @@ export const POST = async (req: NextRequest) => {
 
         // check to see if user is new or login token expired
         const premiumUserExitCheck = await premiumUserExit(userId)
-        // console.log(premiumUserExitCheck)
+        console.log(premiumUserExitCheck)
+        console.log(`premiumUserExitCheck`)
         if(premiumUserExitCheck){
             const dbResult = await getPremiumUserOnClearkId(userId)
             // console.log(dbResult)
@@ -85,13 +87,14 @@ export const POST = async (req: NextRequest) => {
         }
         else if(premiumUserExitCheck === false){
             const createAt = moment().format('YYYY/MM/DD')
-            const dbResult = await insertPremiumUser(userId, null, null, createAt, "free", 10000)
-            // console.log(dbResult)
-            return NextResponse.json({ totalRemainingCredits: 1000, result : dbResult, params:"initiate"})
+            // @ts-ignore
+            const dbResult = await insertPremiumUser(userId, userEmail, userFullName, createAt, "free", 10000, null)
+            console.log(dbResult)
+            return NextResponse.json({ totalRemainingCredits: 10000, result : dbResult, params:"initiate"})
         }
 
 
-        // if not grant 1000 credit with free plan
+        // if not grant 10000 credit with free plan
 
         
     }

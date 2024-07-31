@@ -48,7 +48,7 @@ const CreditUsageTracker = (props: any) => {
     })
 
     
-    console.log("credit usage tracker->, ", remainingCredit)
+    // console.log("credit usage tracker->, ", remainingCredit)
 
     return (
         <div className='m-5'>

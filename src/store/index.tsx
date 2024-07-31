@@ -8,13 +8,13 @@ const userHistorySlice = createSlice({
     initialState: userHistory,
     reducers: {
         toggleCreditHistoryUpdate(state, action) {
-            console.log("-------Hellow from redux -----------''")
-            console.log(`usercredit usage payload ${action.payload}`)
+            // console.log("-------Hellow from redux -----------''")
+            // console.log(`usercredit usage payload ${action.payload}`)
             state.toggleCreditHistoryUpdate = action.payload
         },
         /* @ts-ignore */
         updateCreditUsage(state, action) {
-            console.log("--- redux store-> updateCreditUsage----",action.payload)
+            // console.log("--- redux store-> updateCreditUsage----",action.payload)
             const params = action.payload.params
             if (state.userCreditUsage < action.payload.responseLength) {
                 return state.userCreditUsage

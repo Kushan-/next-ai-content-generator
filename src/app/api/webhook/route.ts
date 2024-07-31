@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-import { stripeCustomerExist, insertStripeCustomer, getPremiumUserOnClearkId } from "@/lib/dbUtils";
 import { STRIPE_WEBHOOK_SECRET_KEY } from "../../../../utils/envConfig";
 import moment from "moment";
-import { insertPremiumUser, upgradeToPaid, getPremiumUserOnStripeCustomerId } from "@/lib/dbUtils";
+import { upgradeToPaid, getPremiumUserOnStripeCustomerId, insertStripeCustomer } from "@/lib/dbUtils";
 import { auth, currentUser } from "@clerk/nextjs/server"
 
 console.log("stripe-webhook-secret", STRIPE_WEBHOOK_SECRET_KEY)
@@ -25,7 +24,7 @@ const getStripeEvents = async (sessionEvent: any) => {
 
 }
 
-export const GET = async(req:NextRequest) =>{
+export const GET = async (req: NextRequest) => {
     console.log(req.body)
     return NextResponse.json({ message: 'Listening to strip hooks' })
 }
@@ -34,12 +33,18 @@ export async function POST(req: NextRequest) {
     const body = await req.text();
 
     const resp = JSON.parse(body)
-    console.log(resp)
+    // console.log("--- stripe response-----")
+    // console.log(resp)
+    // console.log("--- stripe response-----")
+    console.log(resp.data.object.id)
+    const stripeCustomerId = resp.data.object.id
+    const stripeCustomerEmailId = resp.data.object.email
+    console.log(resp.data.object.email)
     const sig = req.headers.get("stripe-signature");
     console.log('sig->', sig, "webhook secret", STRIPE_WEBHOOK_SECRET_KEY)
     let event: Stripe.Event;
     try {
-        
+
         event = stripe.webhooks.constructEvent(
             body,
             sig!,
@@ -49,14 +54,14 @@ export async function POST(req: NextRequest) {
         console.error("Webhook signature verification failed.", err.message);
         return new Response(`Webhook Error: ${err.message}`, { status: 400 });
     }
-    console.log("event->", event.type)
+    // console.log("event->", event.type)
 
     // const customerId = customer.id
     const createAt = moment().format('YYYY/MM/DD')
     // const remainingCredits = 0
     try {
-        const {userId,} = auth()
-        if(event.type === 'checkout.session.completed'){
+        //const {userId,} = auth()
+        if (event.type === 'checkout.session.completed') {
             const checkoutSession = event.data.object
             console.log("----- checkout session-----")
             console.log(checkoutSession)
@@ -67,47 +72,56 @@ export async function POST(req: NextRequest) {
             console.log("---- customer created-----")
             const customerCreated = event.data.object;
 
-            console.log(customerCreated.object)
-
-            // console.log(chargeSucceeded.customer_details)
-            const customerCreatedId = customerCreated.id
-            const customerEmail = customerCreated.email
-            // const userId = customerCreated.metadata.userId
-            console.log("--- customerCreated---", userId)
-            //userId: string, emailAddress: string | undefined, customerId: string | null, createAt: string, plan:string, totalCredit:number
-            //const dbResult = await insertPremiumUser(userId, customerEmail, null, createAt, "free", 10000)
-            // console.log(dbResult)
-            console.log("---- customer created-----")
+            console.log(customerCreated)
+            console.log("--- customerCreated---")
 
         }
         if (event.type === "charge.succeeded") {
             console.log("---- charge succeeded-----")
             const chargeSucceeded = event.data.object;
-            console.log(chargeSucceeded)
-            console.log(chargeSucceeded.status)
+            //console.log(chargeSucceeded)
             if (chargeSucceeded.status === 'succeeded') {
 
                 const chargeSucceededId = chargeSucceeded.id
                 const chargeSucceededName = chargeSucceeded.billing_details.name
                 const chargeSucceededBillingDetails = JSON.stringify(chargeSucceeded.billing_details)
+                const chargeSucceededPaymentDetails = JSON.stringify(chargeSucceeded.payment_method_details)
                 const customerId = chargeSucceeded.customer
                 //const customerEmail = chargeSucceeded.email
+                console.info(chargeSucceededBillingDetails)
+                console.info(chargeSucceededPaymentDetails)
 
-                const metadataUserId = chargeSucceeded.metadata.userId
-                console.log(metadataUserId)
+                const metadataUserId = chargeSucceeded.customer
+                console.log("customerid->", customerId)
                 // @ts-ignore
                 const getPremiumUserCredit = await getPremiumUserOnStripeCustomerId(customerId)
+                // console.log(`getPremiumUserCredit`)
+                // console.log(getPremiumUserCredit)
+                // console.log(`getPremiumUserCredit`)
                 if (getPremiumUserCredit.length > 0) {
                     const remainingCredits = getPremiumUserCredit[0].totalCredit
-                    const stripeDbResult = await insertStripeCustomer(chargeSucceededId, chargeSucceededBillingDetails, "card", createAt)
-                    console.log(stripeDbResult)
                     // @ts-ignore
-                    const result = getPremiumUserOnStripeCustomerId(customerId)
-                    // @ts-ignore
-                    console.log(result[0])
-                    // @ts-ignore
-                    const premiumDbResult = await upgradeToPaid(result[0].userId, remainingCredits + 100000, chargeSucceededId, createAt, "basic", true, chargeSucceededName)
+                    console.log(remainingCredits)
+                    
+                    const upgradeToPaidDbPayload = {
+                        stripeCustomerId:customerId,
+                        // @ts-ignore
+                        totalCredit:remainingCredits + 100000,
+                        plan:"basic",
+                        active:true, 
+                        joinedDate:createAt
+                    }
+                    const premiumDbResult = await upgradeToPaid(upgradeToPaidDbPayload)
                     console.log(premiumDbResult)
+                    const stripeCustomerPayload = {
+                        chargeSucceedId:chargeSucceeded.id,
+                        stripeCustomerId:customerId,
+                        billingDetails:chargeSucceededBillingDetails,
+                        paymentMethod:chargeSucceededPaymentDetails,
+                        createAt:createAt,
+                    }
+                    const stripCustomerInserted = await insertStripeCustomer(stripeCustomerPayload)
+                    console.log(stripCustomerInserted)
                 } else {
                     console.error(getPremiumUserCredit)
                 }

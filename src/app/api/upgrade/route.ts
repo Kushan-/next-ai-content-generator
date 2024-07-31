@@ -5,7 +5,7 @@ import { auth, currentUser } from "@clerk/nextjs/server"
 import { db } from '@/lib/db'
 import { eq } from 'drizzle-orm';
 import { premiumUser, stripeCustomer } from '@/lib/schema'
-import { insertPremiumUser, upgradeToPaid, premiumUserExit, stripeCustomerExist, getPremiumUserOnClearkId } from "@/lib/dbUtils";
+import { getPremiumUserOnStripeCustomerId, premiumUserExit, getPremiumUserOnClearkId , upgradeUserSripeId} from "@/lib/dbUtils";
 import moment from "moment";
 import { Result } from "postcss";
 import { STRIPE_WEBHOOK_ENPOINT_KEY } from "../../../../utils/envConfig";
@@ -21,7 +21,7 @@ interface PREMIUMUSERDATA {
     userId: string
     email: string
     userName: string
-    active: boolean
+    paid: boolean
     joinDate: string
     plan: string
     totalCredit: number
@@ -94,12 +94,10 @@ export const POST = async (req: NextRequest) => {
             else if (env === "production") {
                 env_success_url = `${protocol}//${hostname}/dashboard`
                 env_cancel_url = `${protocol}//${hostname}/`
-                // env_success_url = ENV_PROD_SUCCESS_URL //`http://ai-content-generator.vercel.app/dashboard/`
-                // env_cancel_url = ENV_PROD_CANCEL_URL //`http://ai-content-generator.vercel.app/`
             }
             console.info("env_success_url->", env_success_url)
             console.info("env_cancel_url->", env_cancel_url)
-            console.log(customer.id)
+            console.log("stripe Customer ID - > ", customer.id)
             const session = await stripe.checkout.sessions.create({
                 customer: customer.id,
                 line_items,
@@ -117,11 +115,14 @@ export const POST = async (req: NextRequest) => {
             const customerId = session.customer
             console.log("customerId->",customerId)
             const createAt = moment().format('YYYY/MM/DD')
-            const getTotalRemainingCredits = await getPremiumUserOnClearkId(userId)
+            // @ts-ignore
+            const stripeCustomerExist = await getPremiumUserOnStripeCustomerId(customerId)
+            console.log(stripeCustomer)
             let dbResultSuccess=false
-            if(getTotalRemainingCredits.length>0){
+            if(stripeCustomerExist.length===0){
                 // @ts-ignore
-                const dbResult =  await upgradeToPaid(userId, getTotalRemainingCredits[0].totalCredit, customerId, createAt, "free", "false", null)
+                // only updating customer id in db nothing else
+                const dbResult =  await upgradeUserSripeId(userId, customerId)
                 console.log(dbResult)
                 dbResultSuccess = true
                 //return NextResponse.json({ url: session.url, result: dbResult });
