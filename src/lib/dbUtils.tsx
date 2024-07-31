@@ -84,7 +84,8 @@ export const insertStripeCustomer = async ({...dbPayload}) => {
 }
 
 // on new User afte clerk auth
-export const insertPremiumUser= async(userId: string, emailAddress: string | null, userName: string|null, createAt: string, plan:string, totalCredit:number, customerId:any)=>{
+export const insertPremiumUser= async({...dbPayload})=>{
+    const {userId, emailAddress, userName, createAt, plan, totalCredit, customerId} = dbPayload
     const dbResult = await db.insert(premiumUser).values({
         clerkUserId: userId,
         email: emailAddress,
