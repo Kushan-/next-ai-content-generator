@@ -44,7 +44,6 @@ export async function POST(req: NextRequest) {
     console.log('sig->', sig, "webhook secret", STRIPE_WEBHOOK_SECRET_KEY)
     let event: Stripe.Event;
     try {
-
         event = stripe.webhooks.constructEvent(
             body,
             sig!,

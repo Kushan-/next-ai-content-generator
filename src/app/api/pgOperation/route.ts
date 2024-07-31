@@ -87,10 +87,9 @@ export const POST = async (req: NextRequest) => {
         }
         else if(premiumUserExitCheck === false){
             const createAt = moment().format('YYYY/MM/DD')
-            // @ts-ignore
-            const dbResult = await insertPremiumUser(userId, userEmail, userFullName, createAt, "free", 10000, null)
-            console.log(dbResult)
-            return NextResponse.json({ totalRemainingCredits: 10000, result : dbResult, params:"initiate"})
+            const dbResult = await insertPremiumUser(userId, undefined, null, null, createAt, "free", 10000)
+            // console.log(dbResult)
+            return NextResponse.json({ totalRemainingCredits: 1000, result : dbResult, params:"initiate"})
         }
 
 

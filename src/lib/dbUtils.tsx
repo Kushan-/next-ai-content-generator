@@ -27,6 +27,7 @@ export const getPremiumUserOnStripeCustomerId = async (stripeCustomerId:string) 
     }
 }
 
+
 export const premiumUserExit = async (userId:string) => {
     const result = await getPremiumUserOnClearkId(userId)
 
